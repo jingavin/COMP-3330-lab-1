@@ -20,6 +20,17 @@ const expenseSchema = z.object({
   amount: z.number().int().positive(),
 });
 
+// Allow updating title and/or amount, but not id
+const updateExpenseSchema = z
+  .object({
+    title: z.string().min(3).max(100).optional(),
+    amount: z.number().int().positive().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field is required",
+  })
+  .optional();
+
 const createExpenseSchema = expenseSchema.omit({ id: true });
 
 export type Expense = z.infer<typeof expenseSchema>;
@@ -35,7 +46,7 @@ export const expensesRoute = new Hono()
     const id = Number(c.req.param("id"));
     const item = expenses.find((e) => e.id === id);
     if (!item) return err(c, "not found", 404);
-    return c.json({ expense: item });
+    return ok(c, { expense: item }, 200);
   })
 
   // POST /api/expenses → create (validated)
@@ -44,7 +55,7 @@ export const expensesRoute = new Hono()
     const nextId = (expenses.at(-1)?.id ?? 0) + 1;
     const created: Expense = { id: nextId, ...data };
     expenses.push(created);
-    return c.json({ expense: created }, 201);
+    return ok(c, { expense: created }, 201);
   })
 
   // DELETE /api/expenses/:id → remove
@@ -53,5 +64,30 @@ export const expensesRoute = new Hono()
     const idx = expenses.findIndex((e) => e.id === id);
     if (idx === -1) return err(c, "not found", 404);
     const [removed] = expenses.splice(idx, 1);
-    return c.json({ deleted: removed });
+    return ok(c, { deleted: removed }, 201);
   });
+
+// PUT /api/expenses/:id → full replace
+expensesRoute.put("/:id{\\d+}", zValidator("json", createExpenseSchema), (c) => {
+  const id = Number(c.req.param("id"));
+  const idx = expenses.findIndex((e) => e.id === id);
+  if (idx === -1) return err(c, "Not found", 404);
+
+  const data = c.req.valid("json");
+  const updated: Expense = { id, ...data };
+  expenses[idx] = updated;
+  return ok(c, { expenses: updated }, 201);
+});
+
+// PATCH /api/expenses/:id → partial update
+expensesRoute.patch("/:id{\\d+}", zValidator("json", updateExpenseSchema), (c) => {
+  const id = Number(c.req.param("id"));
+  const idx = expenses.findIndex((e) => e.id === id);
+  if (idx === -1) return err(c, "not found", 404);
+
+  const data = c.req.valid("json");
+  const current = expenses[idx]!;
+  const updated: Expense = { ...current, ...data };
+  expenses[idx] = updated;
+  return ok(c, { expenses: updated });
+});
