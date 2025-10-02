@@ -2,11 +2,21 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { expensesRoute } from "./routes/expenses";
+import { cors } from "hono/cors";
 
 export const app = new Hono();
 
 // Global middleware
 app.use("*", logger());
+
+app.use(
+  "/api/*",
+  cors({
+    origin: "http://localhost:5173",
+    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Custom timing middleware
 app.use("*", async (c, next) => {
