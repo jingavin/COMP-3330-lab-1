@@ -3,6 +3,7 @@ import App from "./App";
 import ExpenseNewPage from "./routes/expenses.new";
 import ExpensesListPage from "./routes/expenses.list";
 import ExpenseDetailPage from "./routes/expenses.detail";
+import Home from "./routes/home";
 
 const rootRoute = createRootRoute({
   component: () => <App />,
@@ -11,7 +12,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: () => <p>Home Page</p>,
+  component: () => <Home />,
 });
 
 const expensesRoute = createRoute({
