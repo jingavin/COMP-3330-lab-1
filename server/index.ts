@@ -1,12 +1,16 @@
 // server/index.ts
 import { app } from "./app";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 
-// Prefer PORT from env; default 3000
-const port = Number(process.env.PORT || 3000);
+const honoApp = new Hono();
 
-export default {
-  port,
-  fetch: app.fetch,
-};
+// allow only your frontend origin and credentials
+honoApp.use("*", cors({
+  origin: "http://localhost:5173", // change to your frontend origin
+  credentials: true,
+  // optionally: allowHeaders: ["Content-Type", "Authorization"], allowMethods: ["GET","POST","PUT","PATCH","OPTIONS"]
+}));
 
-console.log(`🚀 Server running on http://localhost:${port}`);
+
+export default app// ...mount routes / start server ...

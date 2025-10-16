@@ -1,0 +1,1 @@
+ALTER TABLE "expenses" ADD COLUMN "file_url" varchar(500);
