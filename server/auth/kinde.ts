@@ -4,7 +4,8 @@ import { setCookie, deleteCookie, getCookie } from 'hono/cookie'
 import type { SessionManager } from '@kinde-oss/kinde-typescript-sdk'
 import { createKindeServerClient, GrantType } from '@kinde-oss/kinde-typescript-sdk'
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
+console.log("FRONTEND URL HERE", FRONTEND_URL);
 
 export const kindeClient = createKindeServerClient(GrantType.AUTHORIZATION_CODE, {
   authDomain: process.env.KINDE_ISSUER_URL!,
