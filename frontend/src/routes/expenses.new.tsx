@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const API = "http://localhost:3000/api"; // if no Vite proxy, use: 'http://localhost:3000/api'
+const API = "/api"; // if no Vite proxy, use: 'http://localhost:3000/api'
 
 export default function ExpenseNewPage() {
   const router = useRouter();
